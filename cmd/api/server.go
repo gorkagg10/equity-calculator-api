@@ -13,7 +13,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	chimw "github.com/go-chi/chi/v5/middleware"
 
-	"github.com/gorkagg10/equity-calculator-api/internal/handler"
+	"github.com/gorkagg10/equity-calculator-api/internal/http/handler"
 )
 
 func main() {
