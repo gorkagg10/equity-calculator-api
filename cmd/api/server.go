@@ -12,15 +12,23 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	chimw "github.com/go-chi/chi/v5/middleware"
+
+	"github.com/gorkagg10/equity-calculator-api/internal/handler"
 )
 
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
+	portfolioHandler := handler.NewPortfolio()
+
 	router := chi.NewRouter()
 	router.Use(chimw.RequestID)
 	router.Use(chimw.Recoverer)
+
+	router.Route("/v1", func(r chi.Router) {
+		r.Mount("/", portfolioHandler.Routes())
+	})
 
 	srv := &http.Server{
 		Addr:         ":8080",

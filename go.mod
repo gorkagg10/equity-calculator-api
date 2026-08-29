@@ -1,4 +1,4 @@
-module equity-calculator-api
+module github.com/gorkagg10/equity-calculator-api
 
 go 1.24.3
 
