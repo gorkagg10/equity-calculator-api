@@ -7,12 +7,17 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	portfoliodto "github.com/gorkagg10/equity-calculator-api/internal/http/dto/portfolio"
+	"github.com/gorkagg10/equity-calculator-api/internal/service"
 )
 
-type Portfolio struct{}
+type Portfolio struct {
+	service *service.Portfolio
+}
 
-func NewPortfolio() *Portfolio {
-	return &Portfolio{}
+func NewPortfolio(service *service.Portfolio) *Portfolio {
+	return &Portfolio{
+		service: service,
+	}
 }
 
 func (p *Portfolio) Routes() *chi.Mux {
@@ -28,9 +33,14 @@ func (p *Portfolio) Add(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 	}
+	if err := request.Validate(); err != nil {
+		return
+	}
 	response := portfoliodto.AddPortfolioResponse{
 		ID: "hola",
 	}
 	w.WriteHeader(http.StatusCreated)
 	_ = json.NewEncoder(w).Encode(response)
 }
+
+func writeError(w http.ResponseWriter, status int)
