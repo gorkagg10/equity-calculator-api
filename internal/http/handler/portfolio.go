@@ -30,19 +30,20 @@ func (p *Portfolio) Routes() *chi.Mux {
 }
 
 func (p *Portfolio) Add(w http.ResponseWriter, r *http.Request) {
-	var request portfoliodto.AddPortfolioRequest
-	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+	var requestBody portfoliodto.AddPortfolioRequest
+	if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
 		writeError(w, http.StatusBadRequest, "INVALID_BODY", "malformed JSON body")
 		return
 	}
-	if err := request.Validate(); err != nil {
+	if err := requestBody.Validate(); err != nil {
 		writeError(w, http.StatusBadRequest, "INVALID_BODY", err.Error())
 		return
 	}
 
-	portfolio, err := p.service.AddPortfolio(request.Name)
+	portfolio, err := p.service.AddPortfolio(r.Context(), requestBody.Name)
 	if err != nil {
 		handleServiceError(w, err)
+		return
 	}
 	response := portfoliodto.AddPortfolioResponse{
 		ID: portfolio.ID().String(),

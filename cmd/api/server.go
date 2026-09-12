@@ -35,7 +35,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	portfolioService := service.NewPortfolio()
+	pgClient, err := postgres.NewDatabaseClient(ctx, &conf.DatabaseConfig)
+	if err != nil {
+		slog.ErrorContext(ctx, "connecting to database client", slog.String("error", err.Error()))
+		os.Exit(1)
+	}
+
+	portfolioRepository := postgres.NewPortfolioRepository(pgClient)
+	portfolioService := service.NewPortfolio(portfolioRepository)
 	portfolioHandler := handler.NewPortfolio(portfolioService)
 
 	router := chi.NewRouter()
