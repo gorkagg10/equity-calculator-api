@@ -1,7 +1,7 @@
 package service
 
 import (
-	portfoliodto "github.com/gorkagg10/equity-calculator-api/internal/http/dto/portfolio"
+	"github.com/gorkagg10/equity-calculator-api/internal/domain"
 )
 
 type Portfolio struct {
@@ -11,6 +11,10 @@ func NewPortfolio() *Portfolio {
 	return &Portfolio{}
 }
 
-func (p *Portfolio) AddPortfolio(addPortfolioRequest *portfoliodto.AddPortfolioRequest) error {
-	return nil
+func (p *Portfolio) AddPortfolio(name string) (*domain.Portfolio, error) {
+	portfolio, err := domain.NewPortfolio(name)
+	if err != nil {
+		return nil, err
+	}
+	return portfolio, nil
 }

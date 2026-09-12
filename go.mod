@@ -1,5 +1,9 @@
 module github.com/gorkagg10/equity-calculator-api
 
-go 1.24.3
+go 1.25.11
 
-require github.com/go-chi/chi/v5 v5.3.2
+require (
+	github.com/go-chi/chi/v5 v5.3.2
+	github.com/golang-migrate/migrate/v4 v4.20.1
+	github.com/google/uuid v1.6.0
+)

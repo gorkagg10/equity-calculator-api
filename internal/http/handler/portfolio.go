@@ -2,10 +2,12 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 
+	"github.com/gorkagg10/equity-calculator-api/internal/domain"
 	portfoliodto "github.com/gorkagg10/equity-calculator-api/internal/http/dto/portfolio"
 	"github.com/gorkagg10/equity-calculator-api/internal/service"
 )
@@ -29,18 +31,30 @@ func (p *Portfolio) Routes() *chi.Mux {
 
 func (p *Portfolio) Add(w http.ResponseWriter, r *http.Request) {
 	var request portfoliodto.AddPortfolioRequest
-	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-	}
-	if err := request.Validate(); err != nil {
+		writeError(w, http.StatusBadRequest, "INVALID_BODY", "malformed JSON body")
 		return
 	}
-	response := portfoliodto.AddPortfolioResponse{
-		ID: "hola",
+	if err := request.Validate(); err != nil {
+		writeError(w, http.StatusBadRequest, "INVALID_BODY", err.Error())
+		return
 	}
-	w.WriteHeader(http.StatusCreated)
-	_ = json.NewEncoder(w).Encode(response)
+
+	portfolio, err := p.service.AddPortfolio(request.Name)
+	if err != nil {
+		handleServiceError(w, err)
+	}
+	response := portfoliodto.AddPortfolioResponse{
+		ID: portfolio.ID().String(),
+	}
+	writeJSON(w, http.StatusCreated, response)
 }
 
-func writeError(w http.ResponseWriter, status int)
+func handleServiceError(w http.ResponseWriter, err error) {
+	switch {
+	case errors.Is(err, domain.ErrInvalidName):
+		writeError(w, http.StatusBadRequest, "VALIDATION_ERROR", err.Error())
+	default:
+		writeError(w, http.StatusInternalServerError, "INTERNAL_ERROR", "unexpected error")
+	}
+}
