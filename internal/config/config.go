@@ -37,10 +37,6 @@ func NewConfig() (Config, error) {
 	if err != nil {
 		return Config{}, fmt.Errorf("loading database config: %w", err)
 	}
-	natsEndpoint := os.Getenv(NatsEndpoint)
-	if natsEndpoint == "" {
-		return Config{}, fmt.Errorf("loading nats endpoint config: %w", err)
-	}
 	return Config{
 		DatabaseConfig: databaseConfig,
 	}, nil
