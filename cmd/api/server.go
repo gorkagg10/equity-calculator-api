@@ -15,6 +15,7 @@ import (
 
 	"github.com/gorkagg10/equity-calculator-api/internal/config"
 	"github.com/gorkagg10/equity-calculator-api/internal/http/handler"
+	"github.com/gorkagg10/equity-calculator-api/internal/repository/http/yahoofinance"
 	"github.com/gorkagg10/equity-calculator-api/internal/repository/postgres"
 	"github.com/gorkagg10/equity-calculator-api/internal/service"
 )
@@ -45,12 +46,18 @@ func main() {
 	portfolioService := service.NewPortfolio(portfolioRepository)
 	portfolioHandler := handler.NewPortfolio(portfolioService)
 
+	assetRepository := postgres.NewAssetRepository(pgClient)
+	assetDataRepository := yahoofinance.NewAssetDataRepository()
+	assetService := service.NewAsset(assetRepository, assetDataRepository)
+	assetHandler := handler.NewAsset(assetService)
+
 	router := chi.NewRouter()
 	router.Use(chimw.RequestID)
 	router.Use(chimw.Recoverer)
 
 	router.Route("/v1", func(r chi.Router) {
 		r.Mount("/", portfolioHandler.Routes())
+		r.Mount("/assets", assetHandler.Routes())
 	})
 
 	srv := &http.Server{

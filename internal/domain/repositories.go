@@ -9,3 +9,7 @@ type PortfolioRepository interface {
 type AssetDataRepository interface {
 	GetAssetData(symbol string) (*AssetData, error)
 }
+
+type AssetRepository interface {
+	Add(ctx context.Context, asset *Asset) error
+}

@@ -1,28 +1,24 @@
 package domain
 
 import (
-	"time"
-
 	"github.com/google/uuid"
 )
 
 type Asset struct {
 	id uuid.UUID
-	AssetData
-	createdAt time.Time
-	updatedAt time.Time
+	*AssetData
 }
 
 func NewAsset(
 	id uuid.UUID,
-	assetData AssetData,
-	createdAt,
-	updatedAt time.Time,
+	assetData *AssetData,
 ) (*Asset, error) {
 	return &Asset{
 		id:        id,
 		AssetData: assetData,
-		createdAt: createdAt,
-		updatedAt: updatedAt,
 	}, nil
+}
+
+func (a Asset) ID() uuid.UUID {
+	return a.id
 }

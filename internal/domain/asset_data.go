@@ -25,7 +25,7 @@ func NewAssetData(
 }
 
 func (d AssetData) Symbol() string {
-	return d.Symbol()
+	return d.symbol
 }
 
 func (d AssetData) Name() string {
