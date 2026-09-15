@@ -13,3 +13,7 @@ type AssetDataRepository interface {
 type AssetRepository interface {
 	Add(ctx context.Context, asset *Asset) error
 }
+
+type TransactionRepository interface {
+	Add(ctx context.Context, transaction *Transaction) error
+}
