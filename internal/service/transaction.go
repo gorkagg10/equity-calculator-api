@@ -10,19 +10,67 @@ import (
 
 type Transaction struct {
 	transactionRepository domain.TransactionRepository
+	portfolioRepository   domain.PortfolioRepository
+	assetRepository       domain.AssetRepository
+	positionRepository    domain.PositionRepository
 }
 
 func NewTransaction(
 	transactionRepository domain.TransactionRepository,
+	portfolioRepository domain.PortfolioRepository,
+	assetRepository domain.AssetRepository,
+	positionRepository domain.PositionRepository,
 ) *Transaction {
 	return &Transaction{
 		transactionRepository: transactionRepository,
+		portfolioRepository:   portfolioRepository,
+		assetRepository:       assetRepository,
+		positionRepository:    positionRepository,
 	}
 }
 
-func (t *Transaction) Add(ctx context.Context, symbol string, shares float64) (*domain.Transaction, error) {
-	transaction := domain.NewTransaction(uuid.New(), symbol, shares)
-	if err := t.transactionRepository.Add(ctx, transaction); err != nil {
+func (t *Transaction) Add(
+	ctx context.Context,
+	portfolioID uuid.UUID,
+	assetID uuid.UUID,
+	unitPrice,
+	quantity float64,
+	currency,
+	transactionType string,
+) (*domain.Transaction, error) {
+	_, err := t.portfolioRepository.FindByID(ctx, portfolioID)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = t.assetRepository.FindByID(ctx, assetID)
+	if err != nil {
+		return nil, err
+	}
+
+	transaction := domain.NewTransaction(
+		uuid.New(),
+		portfolioID,
+		assetID,
+		transactionType,
+		quantity,
+		unitPrice,
+		currency,
+	)
+	if err = t.transactionRepository.Add(ctx, transaction); err != nil {
+		return nil, err
+	}
+
+	position, err := t.positionRepository.LoadPosition(ctx, portfolioID, assetID)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = position.ApplyTransaction(portfolioID, assetID, transaction); err != nil {
+		return nil, err
+	}
+
+	if err = t.positionRepository.Upsert(ctx, position); err != nil {
 		return nil, err
 	}
 
