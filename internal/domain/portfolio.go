@@ -2,7 +2,6 @@ package domain
 
 import (
 	"errors"
-	"time"
 
 	"github.com/google/uuid"
 )
@@ -12,21 +11,20 @@ var (
 )
 
 type Portfolio struct {
-	id        uuid.UUID
-	name      string
-	createdAt time.Time
-	updatedAt time.Time
+	id   uuid.UUID
+	name string
 }
 
-func NewPortfolio(name string) (*Portfolio, error) {
+func NewPortfolio(
+	id uuid.UUID,
+	name string,
+) (*Portfolio, error) {
 	if name == "" {
 		return nil, ErrInvalidName
 	}
 	return &Portfolio{
-		id:        uuid.New(),
-		name:      name,
-		createdAt: time.Now().UTC(),
-		updatedAt: time.Now().UTC(),
+		id:   id,
+		name: name,
 	}, nil
 }
 
@@ -36,12 +34,4 @@ func (p Portfolio) ID() uuid.UUID {
 
 func (p Portfolio) Name() string {
 	return p.name
-}
-
-func (p Portfolio) CreatedAt() time.Time {
-	return p.createdAt
-}
-
-func (p Portfolio) UpdatedAt() time.Time {
-	return p.updatedAt
 }
