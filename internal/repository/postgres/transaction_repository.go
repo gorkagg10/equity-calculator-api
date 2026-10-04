@@ -22,19 +22,23 @@ func NewTransactionRepository(pgClient *sql.DB) *TransactionRepository {
 func (t TransactionRepository) Add(ctx context.Context, domainTransaction *domain.Transaction) error {
 	transaction := NewTransaction(
 		domainTransaction.ID(),
-		domainTransaction.Symbol(),
-		domainTransaction.Shares(),
+		domainTransaction.PortfolioID(),
+		domainTransaction.AssetID(),
+		domainTransaction.Type(),
+		domainTransaction.Quantity(),
+		domainTransaction.UnitPrice(),
+		domainTransaction.Currency(),
 		time.Now(),
 		time.Now(),
 	)
 
 	if err := t.pgClient.QueryRowContext(
 		ctx,
-		`INSERT INTO transactions (id, symbol, shares, created_at, updated_at)
+		`INSERT INTO transactions (id, assetID, quantity, created_at, updated_at)
 				VALUES($1, $2, $3, $4, $5);`,
 		transaction.ID,
-		transaction.Symbol,
-		transaction.Shares,
+		transaction.AssetID,
+		transaction.Quantity,
 		transaction.CreatedAt,
 		transaction.UpdatedAt,
 	).Err(); err != nil {
