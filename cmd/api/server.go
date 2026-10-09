@@ -30,15 +30,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	err = postgres.Migrate(&conf.DatabaseConfig)
+	pgClient, err := postgres.NewDatabaseClient(ctx, &conf.DatabaseConfig)
 	if err != nil {
-		slog.ErrorContext(ctx, "running database migrations", slog.String("error", err.Error()))
+		slog.ErrorContext(ctx, "creating database client", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
 
-	pgClient, err := postgres.NewDatabaseClient(ctx, &conf.DatabaseConfig)
+	err = postgres.Migrate(pgClient, conf.DatabaseConfig.Database, "migrations")
 	if err != nil {
-		slog.ErrorContext(ctx, "connecting to database client", slog.String("error", err.Error()))
+		slog.ErrorContext(ctx, "running database migrations", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
 

@@ -2,7 +2,9 @@ package service
 
 import (
 	"context"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/gorkagg10/equity-calculator-api/internal/domain"
 )
 
@@ -17,7 +19,12 @@ func NewPortfolio(repository domain.PortfolioRepository) *Portfolio {
 }
 
 func (p *Portfolio) AddPortfolio(ctx context.Context, name string) (*domain.Portfolio, error) {
-	portfolio, err := domain.NewPortfolio(name)
+	portfolio, err := domain.NewPortfolio(
+		uuid.New(),
+		name,
+		time.Now().UTC(),
+		time.Now().UTC(),
+	)
 	if err != nil {
 		return nil, err
 	}

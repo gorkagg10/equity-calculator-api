@@ -29,7 +29,7 @@ func Migrate(pgClient *sql.DB, databaseName, migrationsPath string) error {
 		return err
 	}
 	if errors.Is(err, migrate.ErrNoChange) {
-		slog.Info("migration", slog.String("error", err.Error()))
+		slog.Debug("migration", slog.String("error", err.Error()))
 	}
 	return nil
 }

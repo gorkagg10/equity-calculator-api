@@ -3,8 +3,10 @@ package postgres
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"log/slog"
-	"time"
+
+	"github.com/google/uuid"
 
 	"github.com/gorkagg10/equity-calculator-api/internal/domain"
 )
@@ -19,7 +21,7 @@ func NewAssetRepository(pgClient *sql.DB) *AssetRepository {
 	}
 }
 
-func (a AssetRepository) Add(ctx context.Context, domainAsset *domain.Asset) error {
+func (a *AssetRepository) Add(ctx context.Context, domainAsset *domain.Asset) error {
 	asset := NewAsset(
 		domainAsset.ID(),
 		domainAsset.Name(),
@@ -27,8 +29,8 @@ func (a AssetRepository) Add(ctx context.Context, domainAsset *domain.Asset) err
 		domainAsset.Currency(),
 		domainAsset.Exchange(),
 		domainAsset.Price(),
-		time.Now(),
-		time.Now(),
+		domainAsset.CreatedAt(),
+		domainAsset.UpdatedAt(),
 	)
 
 	if err := a.pgClient.QueryRowContext(
@@ -48,4 +50,38 @@ func (a AssetRepository) Add(ctx context.Context, domainAsset *domain.Asset) err
 		return err
 	}
 	return nil
+}
+
+func (a *AssetRepository) FindByID(ctx context.Context, assetID uuid.UUID) (*domain.Asset, error) {
+	var asset Asset
+
+	if err := a.pgClient.QueryRowContext(
+		ctx,
+		`SELECT id, name, symbol, currency, exchange, price, created_at, updated_at
+		 FROM assets
+		 WHERE id = $1
+		`, assetID).Scan(&asset.ID, &asset.Name, &asset.Symbol, &asset.Currency, &asset.ExchangeName, &asset.Price, &asset.CreatedAt, &asset.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, domain.ErrAssetNotFound
+		}
+		return nil, err
+	}
+
+	domainAsset, err := domain.NewAsset(
+		asset.ID,
+		domain.NewAssetData(
+			asset.Symbol,
+			asset.Name,
+			asset.Price,
+			asset.Currency,
+			asset.ExchangeName,
+		),
+		asset.CreatedAt,
+		asset.UpdatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return domainAsset, nil
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/gorkagg10/equity-calculator-api/internal/domain"
@@ -29,6 +30,8 @@ func (a *Asset) Add(ctx context.Context, symbol string) (*domain.Asset, error) {
 	asset, err := domain.NewAsset(
 		uuid.New(),
 		assetData,
+		time.Now().UTC(),
+		time.Now().UTC(),
 	)
 	if err = a.assetRepository.Add(ctx, asset); err != nil {
 		return nil, err
