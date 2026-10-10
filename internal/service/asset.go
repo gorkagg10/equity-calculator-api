@@ -38,3 +38,19 @@ func (a *Asset) Add(ctx context.Context, symbol string) (*domain.Asset, error) {
 	}
 	return asset, nil
 }
+
+func (a *Asset) UpdatePrices(ctx context.Context) error {
+	assets, err := a.assetRepository.List(ctx)
+	if err != nil {
+		return err
+	}
+	for i, asset := range assets {
+		assetData, err := a.assetDataRepository.GetAssetData(asset.Symbol())
+		if err != nil {
+			return err
+		}
+		assets[i].SetPrice(assetData.Price())
+
+	}
+	return nil
+}

@@ -1,11 +1,10 @@
-CREATE TABLE transactions(
+CREATE TABLE positions(
     id uuid PRIMARY KEY,
     portfolio_id uuid references portfolios(id),
     asset_id uuid references assets(id),
-    transaction_type varchar(10) NOT NULL,
     quantity numeric(18,8) NOT NULL,
-    unit_price numeric(18,4) NOT NULL,
     currency varchar(8) NOT NULL,
     created_at timestamp NOT NULL,
-    updated_at timestamp NOT NULL
-);
+    updated_at timestamp NOT NULL,
+    unique(portfolio_id,asset_id)
+)

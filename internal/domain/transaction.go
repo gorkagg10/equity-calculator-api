@@ -1,6 +1,10 @@
 package domain
 
-import "github.com/google/uuid"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type Transaction struct {
 	id              uuid.UUID
@@ -10,6 +14,8 @@ type Transaction struct {
 	quantity        float64
 	unitPrice       float64
 	currency        string
+	createdAt       time.Time
+	updatedAt       time.Time
 }
 
 func NewTransaction(
@@ -17,9 +23,11 @@ func NewTransaction(
 	portfolioID uuid.UUID,
 	assetID uuid.UUID,
 	transactionType string,
-	quantity float64,
+	quantity,
 	unitPrice float64,
 	currency string,
+	createdAt,
+	updatedAt time.Time,
 ) *Transaction {
 	return &Transaction{
 		id:              id,
@@ -29,6 +37,8 @@ func NewTransaction(
 		quantity:        quantity,
 		unitPrice:       unitPrice,
 		currency:        currency,
+		createdAt:       createdAt,
+		updatedAt:       updatedAt,
 	}
 }
 
@@ -58,4 +68,12 @@ func (t *Transaction) UnitPrice() float64 {
 
 func (t *Transaction) Currency() string {
 	return t.currency
+}
+
+func (t *Transaction) CreatedAt() time.Time {
+	return t.createdAt
+}
+
+func (t *Transaction) UpdatedAt() time.Time {
+	return t.updatedAt
 }

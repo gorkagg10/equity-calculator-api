@@ -2,8 +2,14 @@ package domain
 
 import (
 	"errors"
+	"time"
 
 	"github.com/google/uuid"
+)
+
+const (
+	BuyTransaction  = "BUY"
+	SellTransaction = "SELL"
 )
 
 type Position struct {
@@ -12,6 +18,8 @@ type Position struct {
 	assetID     uuid.UUID
 	quantity    float64
 	currency    string
+	createdAt   time.Time
+	updatedAt   time.Time
 }
 
 func NewPosition(
@@ -20,6 +28,8 @@ func NewPosition(
 	assetID uuid.UUID,
 	quantity float64,
 	currency string,
+	createdAt,
+	updatedAt time.Time,
 ) *Position {
 	return &Position{
 		id:          id,
@@ -27,25 +37,9 @@ func NewPosition(
 		assetID:     assetID,
 		quantity:    quantity,
 		currency:    currency,
+		createdAt:   createdAt,
+		updatedAt:   updatedAt,
 	}
-}
-
-func (p *Position) ApplyTransaction(
-	portfolioID,
-	assetID uuid.UUID,
-	transaction *Transaction,
-) error {
-	if p == nil {
-		p = NewPosition(
-			uuid.New(),
-			portfolioID,
-			assetID,
-			transaction.Quantity(),
-			transaction.Currency(),
-		)
-		return nil
-	}
-	return p.Update(transaction.Type(), transaction.Quantity())
 }
 
 func (p *Position) ID() uuid.UUID {
@@ -56,8 +50,8 @@ func (p *Position) PortfolioID() uuid.UUID {
 	return p.portfolioID
 }
 
-func (p *Position) AssetID() string {
-	return p.AssetID()
+func (p *Position) AssetID() uuid.UUID {
+	return p.assetID
 }
 
 func (p *Position) Quantity() float64 {
@@ -68,11 +62,19 @@ func (p *Position) Currency() string {
 	return p.currency
 }
 
-func (p *Position) Update(transactionType string, quantity float64) error {
+func (p *Position) CreatedAt() time.Time {
+	return p.createdAt
+}
+
+func (p *Position) UpdatedAt() time.Time {
+	return p.updatedAt
+}
+
+func (p *Position) Apply(transactionType string, quantity float64, updateTime time.Time) error {
 	switch transactionType {
-	case "BUY":
+	case BuyTransaction:
 		p.quantity += quantity
-	case "SELL":
+	case SellTransaction:
 		if p.quantity < quantity {
 			return errors.New("unsufficient ammount of assets")
 		}
@@ -80,5 +82,6 @@ func (p *Position) Update(transactionType string, quantity float64) error {
 	default:
 		return errors.New("transaction type not supported")
 	}
+	p.updatedAt = updateTime
 	return nil
 }

@@ -51,13 +51,25 @@ func main() {
 	assetService := service.NewAsset(assetRepository, assetDataRepository)
 	assetHandler := handler.NewAsset(assetService)
 
+	transactionRepository := postgres.NewTransactionRepository(pgClient)
+	positionRepository := postgres.NewPositionRepository(pgClient)
+
+	transactionService := service.NewTransaction(
+		transactionRepository,
+		portfolioRepository,
+		assetRepository,
+		positionRepository,
+	)
+	transactionHandler := handler.NewTransaction(transactionService)
+
 	router := chi.NewRouter()
 	router.Use(chimw.RequestID)
 	router.Use(chimw.Recoverer)
 
 	router.Route("/v1", func(r chi.Router) {
-		r.Mount("/", portfolioHandler.Routes())
+		r.Mount("/portfolios", portfolioHandler.Routes())
 		r.Mount("/assets", assetHandler.Routes())
+		r.Mount("/portfolios/{portfolioID}/transactions", transactionHandler.Routes())
 	})
 
 	srv := &http.Server{

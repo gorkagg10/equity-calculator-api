@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"log/slog"
-	"time"
 
 	"github.com/gorkagg10/equity-calculator-api/internal/domain"
 )
@@ -28,17 +27,21 @@ func (t TransactionRepository) Add(ctx context.Context, domainTransaction *domai
 		domainTransaction.Quantity(),
 		domainTransaction.UnitPrice(),
 		domainTransaction.Currency(),
-		time.Now(),
-		time.Now(),
+		domainTransaction.CreatedAt(),
+		domainTransaction.UpdatedAt(),
 	)
 
 	if err := t.pgClient.QueryRowContext(
 		ctx,
-		`INSERT INTO transactions (id, assetID, quantity, created_at, updated_at)
-				VALUES($1, $2, $3, $4, $5);`,
+		`INSERT INTO transactions (id, portfolio_id, asset_id, transaction_type, quantity, unit_price, currency, created_at, updated_at)
+				VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9);`,
 		transaction.ID,
+		transaction.PortfolioID,
 		transaction.AssetID,
+		transaction.TransactionType,
 		transaction.Quantity,
+		transaction.UnitPrice,
+		transaction.Currency,
 		transaction.CreatedAt,
 		transaction.UpdatedAt,
 	).Err(); err != nil {

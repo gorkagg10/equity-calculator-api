@@ -24,22 +24,26 @@ func NewAssetData(
 	}
 }
 
-func (d AssetData) Symbol() string {
+func (d *AssetData) Symbol() string {
 	return d.symbol
 }
 
-func (d AssetData) Name() string {
+func (d *AssetData) Name() string {
 	return d.name
 }
 
-func (d AssetData) Price() float64 {
+func (d *AssetData) Price() float64 {
 	return d.price
 }
 
-func (d AssetData) Currency() string {
+func (d *AssetData) Currency() string {
 	return d.currency
 }
 
-func (d AssetData) Exchange() string {
+func (d *AssetData) Exchange() string {
 	return d.exchange
+}
+
+func (d *AssetData) SetPrice(price float64) {
+	d.price = price
 }

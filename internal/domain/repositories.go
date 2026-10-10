@@ -19,6 +19,7 @@ type AssetDataRepository interface {
 type AssetRepository interface {
 	Add(ctx context.Context, asset *Asset) error
 	FindByID(ctx context.Context, assetID uuid.UUID) (*Asset, error)
+	List(ctx context.Context) ([]*Asset, error)
 }
 
 type TransactionRepository interface {

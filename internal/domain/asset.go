@@ -27,14 +27,14 @@ func NewAsset(
 	}, nil
 }
 
-func (a Asset) ID() uuid.UUID {
+func (a *Asset) ID() uuid.UUID {
 	return a.id
 }
 
-func (a Asset) CreatedAt() time.Time {
+func (a *Asset) CreatedAt() time.Time {
 	return a.createdAt
 }
 
-func (a Asset) UpdatedAt() time.Time {
+func (a *Asset) UpdatedAt() time.Time {
 	return a.updatedAt
 }

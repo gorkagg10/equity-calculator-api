@@ -24,7 +24,7 @@ func NewPortfolio(service *service.Portfolio) *Portfolio {
 
 func (p *Portfolio) Routes() *chi.Mux {
 	router := chi.NewRouter()
-	router.Post("/portfolios", p.Add)
+	router.Post("/", p.Add)
 
 	return router
 }
