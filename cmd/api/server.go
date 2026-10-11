@@ -48,6 +48,9 @@ func main() {
 
 	assetRepository := postgres.NewAssetRepository(pgClient)
 	assetDataRepository := yahoofinance.NewAssetDataRepository()
+	fxRateRepository := postgres.NewFxRateRepository(pgClient)
+	fxRateService := service.NewFxRate(fxRateRepository, assetDataRepository)
+
 	assetService := service.NewAsset(assetRepository, assetDataRepository)
 	assetHandler := handler.NewAsset(assetService)
 
@@ -78,6 +81,11 @@ func main() {
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  60 * time.Second,
+	}
+
+	if err = fxRateService.RefreshRate(ctx, "USD", "EUR=X"); err != nil {
+		slog.Error("refreshing conversion rate from USD to EUR", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
 
 	go func() {

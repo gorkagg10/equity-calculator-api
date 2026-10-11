@@ -85,3 +85,7 @@ func (a *AssetRepository) FindByID(ctx context.Context, assetID uuid.UUID) (*dom
 
 	return domainAsset, nil
 }
+
+func (a *AssetRepository) List(ctx context.Context) ([]*domain.Asset, error) {
+	return nil, nil
+}

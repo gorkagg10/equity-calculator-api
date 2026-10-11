@@ -30,3 +30,7 @@ type PositionRepository interface {
 	LoadPosition(ctx context.Context, portfolioID uuid.UUID, assetID uuid.UUID) (*Position, error)
 	Upsert(ctx context.Context, position *Position) error
 }
+
+type FxRateRepository interface {
+	Upsert(ctx context.Context, fxRate *FxRate) error
+}
